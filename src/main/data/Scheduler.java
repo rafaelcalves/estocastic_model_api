@@ -2,23 +2,39 @@ package main.data;
 
 public class Scheduler {
 
-    /*Propriedades
-    o time: double
-    • Métodos
-    o getTime(): double  retorna o tempo atual do modelo
-    disparo de eventos e processos
-    o scheduleNow(Event)
-    o scheduleIn(Event, timeToEvent)
-    o scheduleAt(Event, absoluteTime)
-    o startProcessNow(processId)
-    o startProcessIn(processId, timeToStart)
-    o startProcessAt(processId, absoluteTime)
-    o waitFor(time)  se a abordagem para especificação da passagem de tempo nos processos for explícita
-    controlando tempo de execução
-    o simulate  executa até esgotar o modelo, isto é, até a engine não ter mais nada para processar (FEL vazia,
-    i.e., lista de eventos futuros vazia)
-    o simulateOneStep  executa somente uma primitiva da API e interrompe execução; por ex.: dispara um
-    evento e para; insere numa fila e para, etc.
+    private double time;
+
+    public double getTime() { return time; }
+
+    public void scheduleNow(Event event) { }
+
+    public void scheduleIn(Event event, double timeToEvent) { }
+
+    public void scheduleAt(Event event, double absoluteTime) { }
+
+    public void startProcessNow(int processId) { }
+
+    public void startProcessIn(int processId, double timeToEvent) { }
+
+    public void startProcessAt(int processId, double absoluteTime) { }
+
+    public void waitFor(double time) {
+        //se a abordagem para especificação da passagem de tempo nos processos for explícita
+        //    controlando tempo de execução
+    }
+
+    public void simulate () {
+        //executa até esgotar o modelo, isto é, até a engine não ter mais nada para processar (FEL vazia,
+        //    i.e., lista de eventos futuros vazia)
+    }
+
+    public void simulateOneStep () {
+        //executa somente uma primitiva da API e interrompe execução; por ex.: dispara um
+        //    evento e para; insere numa fila e para, etc.
+    }
+
+    //TODO
+    /*
     o simulateBy(duration)
     o simulateUntil(absoluteTime)
     criação, destruição e acesso para componentes

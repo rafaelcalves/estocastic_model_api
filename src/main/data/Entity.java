@@ -24,7 +24,10 @@ public class Entity {
 
     public void setPriority(int priority) { this.priority = priority; }
 
-    //public double getTimeSinceCreation() { }
+    //TODO implementar getTimeSinceCreation
+    public double getTimeSinceCreation() {
+         return 1.0;
+    }
 
     //public int getSets(EntitySet list) {  }
 
