@@ -6,14 +6,14 @@ public class Entity {
     private int id;
     private double creationTime;
     private int priority = -1; //sem prioridade = -1, mais alta = 0, mais baixa = 255
-    //PetriNet net;
+    PetriNet net;
 
     public Entity (String name) { this.name = name; }
 
-    /*public Entity (String name, PetriNet net) {
+    public Entity (String name, PetriNet net) {
     this.name = name;
     this.net = net;
-    }*/
+    }
 
     public int getId() { return id; }
 
@@ -24,15 +24,16 @@ public class Entity {
 
     public void setPriority(int priority) { this.priority = priority; }
 
-    //TODO implementar getTimeSinceCreation
-    public double getTimeSinceCreation() {
-         return 1.0;
+    //Vai ter que receber algo de fora mesmo. Scheduler tem o getTime
+    public double getTimeSinceCreation(double currentTime) {
+         return currentTime - creationTime;
     }
 
-    //public int getSets(EntitySet list) {  }
+    //Vai precisar da montagem de uma lista de listas
+    //public List<EntitySet> getSets(List<EntitySet> list) {  }
 
-    //public int getPetriNet() { return net; }
+    public PetriNet getPetriNet() { return net; }
 
-    //public void setPetriNet(PetriNet net) { this.net = net; }
+    public void setPetriNet(PetriNet net) { this.net = net; }
 
 }

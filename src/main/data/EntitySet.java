@@ -9,7 +9,7 @@ public class EntitySet {
     private String mode = "None"; //suportados: "FIFO","LIFO","Priority based" e "None"
     private int size = 0;
     private int maxPossibleSize = 0; //0 = ilimitado
-    private ArrayList<Entity> entities;
+    private ArrayList<Entity> entities; //rever tipos - arraylist é o ideal ou não?
 
     public EntitySet(String name, String mode, int maxPossibleSize) {
         this.name = name;
