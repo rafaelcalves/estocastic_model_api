@@ -74,15 +74,21 @@ public class EntitySet {
         return target;
     }
 
-    //public double averageSize() {  }
-
     public int getSize() { return size; }
 
     public int getMaxPossibleSize() { return maxPossibleSize; }
 
     public void setMaxPossibleSize(int maxPossibleSize) { this.maxPossibleSize = maxPossibleSize; }
 
-    //public double averageSize() {  }
+    //pega média de tamanhos do set (histórica)
+    public double averageSize() {
+        int average = 0;
+        for (int i=0; i<this.averageSizes.size(); i++) {
+            average += this.averageSizes.get(i);
+        }
+        average = average/this.averageSizes.size();
+        return average;
+    }
 
     //passa o tempo atual como current
     public double averageTimeInSet(double current) {
@@ -94,6 +100,7 @@ public class EntitySet {
         return average;
     }
 
+    //tempo máximo que algo ficou no set
     public double maxTimeInSet(double current) {
         double maximum = 0.0;
         for(int i=0; i < entities.size(); i++) {
@@ -107,14 +114,13 @@ public class EntitySet {
         this.logging = true;
     }
 
-    public void stopLog() {  }
+    public void stopLog() {
+        this.logging = false;
+    }
 
-    //public Log getLog() {  }
+    //pega tamanho agora para fins de logging (temporizado)
+    public void getLog() {
+        averageSizes.add(this.getSize());
+    }
 
-    /*o averageSize(): double  retorna quantidade média de entidades no conjunto
-    o startLog(timeGap)  dispara a coleta (log) do tamanho do conjunto; esta coleta é realizada a cada
-    timeGap unidades de tempo
-    o stopLog()
-    o getLog())  retorna uma lista contendo o log deste Resource até o momento; cada elemento desta lista
-    é um par <tempoAbsoluto, tamanhoConjunto>*/
 }
