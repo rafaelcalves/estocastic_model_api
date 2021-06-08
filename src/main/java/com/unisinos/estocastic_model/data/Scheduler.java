@@ -1,4 +1,4 @@
-package main.data;
+package com.unisinos.estocastic_model.data;
 
 public class Scheduler {
 

@@ -1,4 +1,4 @@
-package main.data;
+package com.unisinos.estocastic_model.data;
 
 public class PetriNet {
     //Fazer baseada nos elementos básicos possíveis (models) conforme trabalho do GA (Net em particular)???
