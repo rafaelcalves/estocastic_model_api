@@ -8,8 +8,11 @@ public class EntitySet {
     private int id;
     private String mode = "None"; //suportados: "FIFO","LIFO","Priority based" e "None"
     private int size = 0;
+    private ArrayList<int> averageSizes; //para pegar média de tamanhos
     private int maxPossibleSize = 0; //0 = ilimitado
     private ArrayList<Entity> entities; //rever tipos - arraylist é o ideal ou não?
+    boolean logging = false; //para controle global de se está realizando logging
+    double loggingTimeGap = 5.0; //de quanto em quanto tempo vai logar
 
     public EntitySet(String name, String mode, int maxPossibleSize) {
         this.name = name;
@@ -48,7 +51,11 @@ public class EntitySet {
         return output;
     }
 
-    //public void removeById(int id) {  }
+    public void removeById(int id) {
+        for(int i=0; i < entities.size(); i++) {
+            if(entities.get(i).getId() == id) entities.remove(i);
+        }
+    }
 
     public boolean isEmpty() {
         return this.entities.isEmpty();
@@ -59,7 +66,13 @@ public class EntitySet {
         else return false;
     }
 
-    //public Entity findEntity(int id) {  }
+    public Entity findEntity(int id) {
+        Entity target = null;
+        for(int i=0; i < entities.size(); i++) {
+            if(entities.get(i).getId() == id) target = entities.get(i);
+        }
+        return target;
+    }
 
     //public double averageSize() {  }
 
@@ -71,22 +84,34 @@ public class EntitySet {
 
     //public double averageSize() {  }
 
-    //public double averageTimeInSet() {  }
+    //passa o tempo atual como current
+    public double averageTimeInSet(double current) {
+        double average = 0;
+        for(int i=0; i < entities.size(); i++) {
+            average += entities.get(i).getTimeSinceCreation(current);
+        }
+        average = average/entities.size();
+        return average;
+    }
 
-    //public double maxTimeInSet() {  }
+    public double maxTimeInSet(double current) {
+        double maximum = 0.0;
+        for(int i=0; i < entities.size(); i++) {
+            if(entities.get(i).getTimeSinceCreation(current) > maximum) maximum = entities.get(i).getTimeSinceCreation(current);
+        }
+        return maximum;
+    }
 
-    //public void startLog(double timeGap) {  }
+    public void startLog(double timeGap) {
+        this.loggingTimeGap = timeGap;
+        this.logging = true;
+    }
 
-    //public void stopLog() {  }
+    public void stopLog() {  }
 
     //public Log getLog() {  }
 
-    /*o removeById(id): Entity
-    o findEntity(id): Entity  retorna referência para uma Entity, se esta estiver presente nesta EntitySet
-    coleta de estatísticas
-    o averageSize(): double  retorna quantidade média de entidades no conjunto
-    o averageTimeInSet(): double  retorna tempo médio que as entidades permaneceram neste conjunto
-    o maxTimeInSet(): double  retorna tempo mais longo que uma entidade permaneceu neste conjunto
+    /*o averageSize(): double  retorna quantidade média de entidades no conjunto
     o startLog(timeGap)  dispara a coleta (log) do tamanho do conjunto; esta coleta é realizada a cada
     timeGap unidades de tempo
     o stopLog()
