@@ -3,5 +3,7 @@ A proposta desta é o desenvolvimento e o teste de uma engine de simulação de 
 
 A solução inicial consiste de uma aproximação em cima da sugestão de estrutura básica proposta pelo professor.
 
-Para importar o submódulo petrinet:
+Para importar o submódulo petrinet branch `estocastic-model`:
 ```git submodule update --init```
+Caso seja feita alguma alteração no submódulo:
+```git submodule udate --remote```
