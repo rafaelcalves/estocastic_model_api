@@ -1,3 +1,4 @@
 [submodule "petrinet"]
 	path = petrinet
 	url = https://github.com/ASG1711/SimModSisTGA.git
+	branch = estocastic-model
