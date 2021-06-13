@@ -33,31 +33,59 @@ public class Scheduler {
         //    evento e para; insere numa fila e para, etc.
     }
 
-    //TODO
-    /*
-    o simulateBy(duration)
-    o simulateUntil(absoluteTime)
-    criação, destruição e acesso para componentes
-    o createEntity(Entity)  instancia nova Entity e destroyEntity(id)
-    o getEntity(id): Entity Entity  retorna referência para instância de Entity
-    o createResource(name, quantity):id
-    o getResource(id): Resource  retorna referência para instância de Resource
-    o createProcess(name, duration): processId
-    o getProcess(processId):Process  retorna referência para instancia de Process
-    o createEvent(name): eventId
-    o getEvent(eventId):Event  retorna referência para instancia de Event
-    o createEntitySet(name, mode, maxPossibleSize): id
-    o getEntitySet(id): EntitySet  retorna referência para instancia de EntitySet
-    random variates
-    o uniform(minValue, maxValue: double
-    o exponential(meanValue): double
-    o normal(meanValue, stdDeviationValue): double
-    coleta de estatísticas
+    public void simulateBy(double duration) {  }
+
+    public void simulateUntil(double absoluteTime) {  }
+
+    //criação, destruição e acesso para componentes
+
+    public void createEntity(Entity entity) {  }
+
+    public void destroyEntity(int id) {  }
+
+    //public Entity getEntity(int id) {  }
+
+    //o createResource(name, quantity):id
+    //public int createResource(String name, int quantity) {  }
+
+    //public Resource getResource(int id) {  }
+
+    //o createProcess(name, duration): processId
+    //public int createProcess(String name, double duration) {  }
+
+    //o createEvent(name): eventId
+    //public int createEvent(String name) {  }
+
+    //public Event getEvent(int id) {  }
+
+    //o createEntitySet(name, mode, maxPossibleSize): id
+    //public int createEntitySet(String name, int mode, int maxPossibleSize) {  }
+
+    //public EntitySet getEntitySet(int id) {  }
+
+    //coleta de estatísticas
+
+    //public double uniform(double minValue, double maxValue) {  }
+
+    //public double exponential(double meanValue) {  }
+
+    //public double normal(double meanValue, double stdDeviationValue) {  }
+
+    //public int getEntityTotalQuantity() {  }
+
+    //public int getEntityTotalQuantityNamed(String name) {  }
+
+    //public double averageTimeInModel() {  }
+
+    //public int maxEntitiesPresent() {  }
+
+    /*coleta de estatísticas
     o getEntityTotalQuantity(): integer  retorna quantidade de entidades criadas até o momento
     o getEntityTotalQuantity(name): integer  retorna quantidade de entidades criadas cujo nome
     corresponde ao parâmetro, até o momento
     o averageTimeInModel(): double  retorna o tempo médio que as entidades permanecem no modelo,
     desde sua criação até sua destruição
     o maxEntitiesPresent():integer  retorna o número máximo de entidades presentes no modelo até o
-    momento*/
+            momento*/
+
 }
