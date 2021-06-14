@@ -8,7 +8,7 @@ public class EntitySet {
     private int id;
     private String mode = "None"; //suportados: "FIFO","LIFO","Priority based" e "None"
     private int size = 0;
-    private ArrayList<int> averageSizes; //para pegar média de tamanhos
+    private ArrayList<Integer> averageSizes; //para pegar média de tamanhos
     private int maxPossibleSize = 0; //0 = ilimitado
     private ArrayList<Entity> entities; //rever tipos - arraylist é o ideal ou não?
     boolean logging = false; //para controle global de se está realizando logging

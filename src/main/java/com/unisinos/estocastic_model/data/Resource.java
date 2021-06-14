@@ -9,8 +9,8 @@ public class Resource {
     private int quantity; //quantidade de recursos disponíveis
     private int totalQuantity; //total para controle de rates
     private double allocationTime; //para controle de tempo de alocação - de repente fazer um array/list ?
-    private ArrayList<double> allocationRatesTimes; //para a função de average da alocação (tempo)
-    private ArrayList<double> allocationRatesAverages; //para a função de average da alocação (quantia)
+    private ArrayList<Double> allocationRatesTimes; //para a função de average da alocação (tempo)
+    private ArrayList<Double> allocationRatesAverages; //para a função de average da alocação (quantia)
 
     public Resource (String name, int quantity) {
         this.name = name;
