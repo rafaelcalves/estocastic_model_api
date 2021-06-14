@@ -8,9 +8,10 @@ public class Resource {
     private int id;
     private int quantity; //quantidade de recursos disponíveis
     private int totalQuantity; //total para controle de rates
-    private double allocationTime; //para controle de tempo de alocação - de repente fazer um array/list ?
+    private double allocationTime; //para controle de tempo de alocação
+    private double currentAllocate; //
     private ArrayList<Double> allocationRatesTimes; //para a função de average da alocação (tempo)
-    private ArrayList<Double> allocationRatesAverages; //para a função de average da alocação (quantia)
+    private ArrayList<Double> allocationRatesAverages; //para a função de average da alocação (quantidade)
 
     public Resource (String name, int quantity) {
         this.name = name;
@@ -19,34 +20,32 @@ public class Resource {
     }
 
     //true se conseguiu alocar os recursos
-    public boolean allocate (int quantity) {
+    public boolean allocate (int quantity, double time) {
        if(quantity <= this.quantity) {
            this.quantity -= quantity;
+           if (currentAllocate == 0) currentAllocate = time;
            return true; //sinal para o log?
        }
        else return false; //sinal para o log?
     }
 
     /*quebra o galho como adição de resources também*/
-    public void release (int quantity) {
+    public void release (int quantity, double time) {
         this.quantity += quantity; //sinal para o log?
-        if(quantity > totalQuantity) totalQuantity = quantity;
+        if(quantity >= totalQuantity) {
+            totalQuantity = quantity;
+            allocationRatesTimes.add(allocationRate(time, currentAllocate));
+            currentAllocate = 0;
+        }
     }
 
     //coleta de estatísticas
 
-    //REVISAR!
-
-    /*para funcionar da forma que está teria que rodar o tempo inteiro, porém o output pode ser abstraido e só
-    referenciado quando necessário*/
-    public double allocationRate(double currentTime) {
+    public double allocationRate(double currentTime, double currentAllocate) {
         /*percentual do tempo (em relação ao tempo total simulado) em que estes recursos foram alocados
          em 10 seg, durante 2 seg houveram recursos alocados (essa taxa seria
          então de 2/10 = 0.2 recursos/seg.)*/
-        if(quantity != totalQuantity) {
-            allocationTime++;
-        }
-        else allocationTime = 0;
+        allocationTime = currentTime - currentAllocate;
         return allocationTime/currentTime;
     }
 
