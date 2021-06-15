@@ -8,11 +8,17 @@ public class Entity {
     private int priority = -1; //sem prioridade = -1, mais alta = 0, mais baixa = 255
     PetriNet net;
 
-    public Entity (String name) { this.name = name; }
+    public Entity (String name, int id, double creationTime) {
+        this.name = name;
+        this.id = id;
+        this.creationTime = creationTime;
+    }
 
-    public Entity (String name, PetriNet net) {
-    this.name = name;
-    this.net = net;
+    public Entity (String name, int id, double creationTime, PetriNet net) {
+        this.name = name;
+        this.id = id;
+        this.creationTime = creationTime;
+        this.net = net;
     }
 
     public int getId() { return id; }

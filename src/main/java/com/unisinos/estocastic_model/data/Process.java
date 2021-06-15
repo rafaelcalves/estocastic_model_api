@@ -4,6 +4,7 @@ public class Process {
 
     private String name;
     private int processId;
+    private double timeTo; //tempo até ativar
     private double duration;
     private boolean active;
 
@@ -15,6 +16,10 @@ public class Process {
     public double getDuration() { return duration; }
 
     public void setDuration(double duration) { this.duration = duration; }
+
+    public double getTimeTo() { return timeTo; }
+
+    public void setTimeTo(double timeTo) { this.timeTo = timeTo; }
 
     public boolean isActive() { return active; }
 

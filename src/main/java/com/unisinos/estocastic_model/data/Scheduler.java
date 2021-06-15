@@ -1,22 +1,72 @@
 package com.unisinos.estocastic_model.data;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 public class Scheduler {
 
     private double time;
+    private ArrayList<EntitySet> entitySets;
+    private ArrayList<Event> events;
+    private ArrayList<Process> processes;
+
+    private Random fRandom = new Random(); //para cálculos
 
     public double getTime() { return time; }
 
-    public void scheduleNow(Event event) { }
+    public double mapEventDuration(Event event) {
+        double result = 0;
+        switch(event.getName()) {
+            case "chegada":
+                result = exponential(3.0);
+            break;
+            case "pedido":
+                result = normal(8, 2);
+            break;
+            case "preparo":
+                result = normal(14, 5);
+            break;
+            case "refeição":
+                result = normal(20, 8);
+            break;
+            case "banheiro":
+                result = uniform(120, 180);
+            break;
+            default:
+            break;
+        }
+        return result;
+    }
 
-    public void scheduleIn(Event event, double timeToEvent) { }
+    public void scheduleNow(Event event) {
+        Process newProcess = new Process(event.getName(), mapEventDuration(event));
+        newProcess.activate(true);
+        processes.add(newProcess);
+    }
 
-    public void scheduleAt(Event event, double absoluteTime) { }
+    public void scheduleIn(Event event, double timeToEvent) {
+        Process newProcess = new Process(event.getName(), mapEventDuration(event));
+        newProcess.setTimeTo(timeToEvent);
+        processes.add(newProcess);
+    }
 
-    public void startProcessNow(int processId) { }
+    public void scheduleAt(Event event, double absoluteTime) {
+        Process newProcess = new Process(event.getName(), mapEventDuration(event));
+        newProcess.setTimeTo(absoluteTime - time);
+        processes.add(newProcess);
+    }
 
-    public void startProcessIn(int processId, double timeToEvent) { }
+    public void startProcessNow(int processId) {
 
-    public void startProcessAt(int processId, double absoluteTime) { }
+    }
+
+    public void startProcessIn(int processId, double timeToEvent) {
+
+    }
+
+    public void startProcessAt(int processId, double absoluteTime) {
+
+    }
 
     public void waitFor(double time) {
         //se a abordagem para especificação da passagem de tempo nos processos for explícita
@@ -39,7 +89,9 @@ public class Scheduler {
 
     //criação, destruição e acesso para componentes
 
-    public void createEntity(Entity entity) {  }
+    public void createEntity(String name, int id, int priority, PetriNet net) {
+
+    }
 
     public void destroyEntity(int id) {  }
 
@@ -63,13 +115,21 @@ public class Scheduler {
 
     //public EntitySet getEntitySet(int id) {  }
 
+    //random variates
+
+    public double uniform(double minValue, double maxValue) {
+        return minValue + (maxValue - minValue) * fRandom.nextDouble();
+    }
+
+    public double exponential(double meanValue) {
+        return - (Math.log(fRandom.nextDouble()) / meanValue);
+    }
+
+    public double normal(double meanValue, double stdDeviationValue) {
+        return meanValue + fRandom.nextGaussian()*stdDeviationValue;
+    }
+
     //coleta de estatísticas
-
-    //public double uniform(double minValue, double maxValue) {  }
-
-    //public double exponential(double meanValue) {  }
-
-    //public double normal(double meanValue, double stdDeviationValue) {  }
 
     //public int getEntityTotalQuantity() {  }
 

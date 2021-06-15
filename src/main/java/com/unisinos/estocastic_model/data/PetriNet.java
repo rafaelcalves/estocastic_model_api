@@ -16,6 +16,7 @@ public class PetriNet {
 
     private void getCallback() {  }
 
+    //pega id da location na rede e coloca token
     private void allocateToken(String id) {  }
 
     /*Talvez gets e sets para os places em particular com os quais o modelo irá interagir
