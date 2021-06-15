@@ -21,6 +21,10 @@ public class Process {
 
     public void setTimeTo(double timeTo) { this.timeTo = timeTo; }
 
+    public int getProcessId () { return this.processId; }
+
+    public void setProcessId(int id) { this.processId = id; }
+
     public boolean isActive() { return active; }
 
     public void activate(boolean active) { this.active = active; }

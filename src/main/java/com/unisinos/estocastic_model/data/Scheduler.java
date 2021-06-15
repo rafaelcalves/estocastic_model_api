@@ -9,10 +9,11 @@ public class Scheduler {
     private ArrayList<EntitySet> entitySets;
     private ArrayList<Event> events;
     private ArrayList<Process> processes;
+    private ArrayList<Resource> resources;
 
     private Random fRandom = new Random(); //para cálculos
 
-    public double getTime() { return time; }
+    public double getTime() { return this.time; }
 
     public double mapEventDuration(Event event) {
         double result = 0;
@@ -57,20 +58,27 @@ public class Scheduler {
     }
 
     public void startProcessNow(int processId) {
-
+        for(int i=0; i < processes.size(); i++) {
+            if(processes.get(i).getProcessId() == processId) processes.get(i).activate(true);
+        }
     }
 
     public void startProcessIn(int processId, double timeToEvent) {
-
+        for(int i=0; i < processes.size(); i++) {
+            if(processes.get(i).getProcessId() == processId) processes.get(i).setTimeTo(timeToEvent);
+        }
     }
 
     public void startProcessAt(int processId, double absoluteTime) {
-
+        for(int i=0; i < processes.size(); i++) {
+            if(processes.get(i).getProcessId() == processId) processes.get(i).setTimeTo(absoluteTime - time);
+        }
     }
 
     public void waitFor(double time) {
         //se a abordagem para especificação da passagem de tempo nos processos for explícita
         //    controlando tempo de execução
+        this.time += time;
     }
 
     public void simulate () {
@@ -81,6 +89,7 @@ public class Scheduler {
     public void simulateOneStep () {
         //executa somente uma primitiva da API e interrompe execução; por ex.: dispara um
         //    evento e para; insere numa fila e para, etc.
+
     }
 
     public void simulateBy(double duration) {  }
