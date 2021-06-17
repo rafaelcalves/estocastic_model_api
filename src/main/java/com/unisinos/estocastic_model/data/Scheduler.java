@@ -11,10 +11,12 @@ public class Scheduler {
     private ArrayList<Process> processes;
     private ArrayList<Resource> resources;
 
-    private Random fRandom = new Random(); //para cálculos
+    private Random fRandom = new Random(); //para cálculos usando random (distribuições)
 
+    //pega o tempo do exato instante atual
     public double getTime() { return this.time; }
 
+    //dependendo do tipo de evento, calcula tempo para iniciar
     public double mapEventDuration(Event event) {
         double result = 0;
         switch(event.getName()) {
@@ -39,45 +41,50 @@ public class Scheduler {
         return result;
     }
 
+    //converte um evento em um processo marcado para esse exato instante
     public void scheduleNow(Event event) {
         Process newProcess = new Process(event.getName(), mapEventDuration(event));
         newProcess.activate(true);
         processes.add(newProcess);
     }
 
+    //converte um evento em um processo marcado para em algum tempo
     public void scheduleIn(Event event, double timeToEvent) {
         Process newProcess = new Process(event.getName(), mapEventDuration(event));
         newProcess.setTimeTo(timeToEvent);
         processes.add(newProcess);
     }
 
+    //converte um evento em um processo marcado para um exato timestamp
     public void scheduleAt(Event event, double absoluteTime) {
         Process newProcess = new Process(event.getName(), mapEventDuration(event));
         newProcess.setTimeTo(absoluteTime - time);
         processes.add(newProcess);
     }
 
+    //inicia um processo por ID nesse exato instante
     public void startProcessNow(int processId) {
         for(int i=0; i < processes.size(); i++) {
             if(processes.get(i).getProcessId() == processId) processes.get(i).activate(true);
         }
     }
 
+    //inicia um processo por ID em algum tempo
     public void startProcessIn(int processId, double timeToEvent) {
         for(int i=0; i < processes.size(); i++) {
             if(processes.get(i).getProcessId() == processId) processes.get(i).setTimeTo(timeToEvent);
         }
     }
 
+    //inicia um processo por ID em um exato timestamp
     public void startProcessAt(int processId, double absoluteTime) {
         for(int i=0; i < processes.size(); i++) {
             if(processes.get(i).getProcessId() == processId) processes.get(i).setTimeTo(absoluteTime - time);
         }
     }
 
+    //espera por um tempo
     public void waitFor(double time) {
-        //se a abordagem para especificação da passagem de tempo nos processos for explícita
-        //    controlando tempo de execução
         this.time += time;
     }
 
@@ -98,31 +105,78 @@ public class Scheduler {
 
     //criação, destruição e acesso para componentes
 
-    public void createEntity(String name, int id, int priority, PetriNet net) {
-
+    public Entity createEntity(String name, int id, int priority, PetriNet net) {
+        Entity newEntity = new Entity(name, id, this.getTime(), net);
+        newEntity.setPriority(priority);
+        return newEntity;
     }
 
-    public void destroyEntity(int id) {  }
+    //a princípio IDs vão ser todos únicos
+    public void destroyEntity(int id) {
+        for(int i = 0; i < entitySets.size(); i++) { //vai em todos os entitysets
+            entitySets.get(i).removeById(id); //procura e remove
+        }
+    }
 
-    //public Entity getEntity(int id) {  }
+    //a princípio IDs vão ser todos únicos
+    public Entity getEntity(int id) {
+        Entity temp = null; //inicia com "ponteiro" vazio
+        for(int i = 0; i < entitySets.size(); i++) { //vai em todas as entitysets
+            temp = entitySets.get(i).findEntity(id); //procura e passa pro ponteiro
+        }
+        return temp;
+    }
 
-    //o createResource(name, quantity):id
-    //public int createResource(String name, int quantity) {  }
+    //o createResource(name, quantity):id -- revisar. Precisa retornar ID??
+    public Resource createResource(String name, int id, int quantity) {
+        Resource newResource = new Resource(name, id, quantity);
+        return newResource;
+    }
 
-    //public Resource getResource(int id) {  }
+    public Resource getResource(int id) {
+        Resource result = null;
+        for(int i = 0; i < resources.size(); i++) {
+            if(resources.get(i).getId() == id) result = resources.get(i);
+        }
+        return result;
+    }
 
-    //o createProcess(name, duration): processId
-    //public int createProcess(String name, double duration) {  }
+    //o createProcess(name, duration): processId -- revisar. Precisa retornar ID??
+    public Process createProcess(String name, int id, double duration) {
+        Process newProcess = new Process(name, duration);
+        newProcess.setProcessId(id);
+        return newProcess;
+    }
 
-    //o createEvent(name): eventId
-    //public int createEvent(String name) {  }
+    //o createEvent(name): eventId -- revisar. Precisa retornar ID??
+    public Event createEvent(String name, int id) {
+        Event newEvent = new Event(name);
+        newEvent.setEventId(id);
+        return newEvent;
+    }
 
-    //public Event getEvent(int id) {  }
+    public Event getEvent(int id) {
+        Event result = null;
+        for(int i = 0; i < events.size(); i++) {
+            if(events.get(i).getEventId() == id) result = events.get(i);
+        }
+        return result;
+    }
 
-    //o createEntitySet(name, mode, maxPossibleSize): id
-    //public int createEntitySet(String name, int mode, int maxPossibleSize) {  }
+    //o createEntitySet(name, mode, maxPossibleSize): id -- revisar. Precisa retornar ID??
+    public EntitySet createEntitySet(String name, int id, String mode, int maxPossibleSize) {
+        EntitySet newEntitySet = new EntitySet(name, mode, maxPossibleSize);
+        newEntitySet.setEntitySetId(id);
+        return newEntitySet;
+    }
 
-    //public EntitySet getEntitySet(int id) {  }
+    public EntitySet getEntitySet(int id) {
+        EntitySet result = null;
+        for(int i = 0; i < entitySets.size(); i++) {
+            if(entitySets.get(i).getEntitySetId() == id) result = entitySets.get(i);
+        }
+        return result;
+    }
 
     //random variates
 
@@ -140,21 +194,38 @@ public class Scheduler {
 
     //coleta de estatísticas
 
-    //public int getEntityTotalQuantity() {  }
+    public int getEntityTotalQuantity() {
+        int totalEntities = 0;
+        for(int i = 0; i < entitySets.size(); i++) {
+            totalEntities += entitySets.get(i).getSize();
+        }
+        return totalEntities;
+    }
 
-    //public int getEntityTotalQuantityNamed(String name) {  }
+    public int getEntityTotalQuantityNamed(String name) {
+        int totalEntities = 0;
+        for(int i = 0; i < entitySets.size(); i++) {
+            totalEntities += entitySets.get(i).countEntity(name);
+        }
+        return totalEntities;
+    }
 
-    //public double averageTimeInModel() {  }
+    public double averageTimeInModel() {
+        double average = 0;
+        int amount = 0;
+        for(int i = 0; i < entitySets.size(); i++) {
+            average += entitySets.get(i).averageTimeInSet(this.getTime());
+            amount++;
+        }
+        return average/amount;
+    }
 
-    //public int maxEntitiesPresent() {  }
-
-    /*coleta de estatísticas
-    o getEntityTotalQuantity(): integer  retorna quantidade de entidades criadas até o momento
-    o getEntityTotalQuantity(name): integer  retorna quantidade de entidades criadas cujo nome
-    corresponde ao parâmetro, até o momento
-    o averageTimeInModel(): double  retorna o tempo médio que as entidades permanecem no modelo,
-    desde sua criação até sua destruição
-    o maxEntitiesPresent():integer  retorna o número máximo de entidades presentes no modelo até o
-            momento*/
+    public int maxEntitiesPresent() {
+        int max = 0;
+        for(int i = 0; i < entitySets.size(); i++) {
+            max += entitySets.get(i).getMaxPossibleSize();
+        }
+        return max;
+    }
 
 }

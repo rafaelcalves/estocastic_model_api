@@ -1,5 +1,7 @@
 package com.unisinos.estocastic_model.data;
 
+import java.util.ArrayList;
+
 public class Entity {
 
     private String name;
@@ -21,7 +23,9 @@ public class Entity {
         this.net = net;
     }
 
-    public int getId() { return id; }
+    public int getId() { return this.id; }
+
+    public String getName() { return this.name; }
 
     public int getPriority() {
         if (priority < 0 || priority > 255) priority = -1; //deve estar entre 0 e 255
@@ -36,7 +40,18 @@ public class Entity {
     }
 
     //Vai precisar da montagem de uma lista de listas
-    //public List<EntitySet> getSets(List<EntitySet> list) {  }
+    public ArrayList<EntitySet> getSets(ArrayList<EntitySet> list) {
+        ArrayList<EntitySet> result = null; //resultado nulo inicialmente
+        Entity temp = null; //ponteiro pra entity comparativa
+        for(int i = 0; i < list.size(); i++) { //vai em todos os entitysets
+            temp = list.get(i).findEntity(id); //testa se está em um
+            if(temp != null) { //se estiver
+                result.add(list.get(i)); //joga o entityset no result
+                temp = null; //e zera o "ponteiro" de novo pra próxima entityset
+            }
+        }
+        return result;
+    }
 
     public PetriNet getPetriNet() { return net; }
 

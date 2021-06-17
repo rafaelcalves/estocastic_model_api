@@ -9,12 +9,14 @@ public class Resource {
     private int quantity; //quantidade de recursos disponíveis
     private int totalQuantity; //total para controle de rates
     private double allocationTime; //para controle de tempo de alocação
-    private double currentAllocate; //
+    private double currentAllocate; //para controle do tempo de alocação - ultima vez alocado
+    //reduz tempo atual da última vez que alocou para saber tempo de alocação
     private ArrayList<Double> allocationRatesTimes; //para a função de average da alocação (tempo)
     private ArrayList<Double> allocationRatesAverages; //para a função de average da alocação (quantidade)
 
-    public Resource (String name, int quantity) {
+    public Resource (String name, int id, int quantity) {
         this.name = name;
+        this.id = id;
         this.quantity = quantity;
         this.totalQuantity = quantity;
     }
@@ -23,19 +25,21 @@ public class Resource {
     public boolean allocate (int quantity, double time) {
        if(quantity <= this.quantity) {
            this.quantity -= quantity;
+           //se não tem nada alocado, seta tempo alocado para esse atual instante
            if (currentAllocate == 0) currentAllocate = time;
            return true; //sinal para o log?
        }
        else return false; //sinal para o log?
     }
 
-    /*quebra o galho como adição de resources também*/
     public void release (int quantity, double time) {
         this.quantity += quantity; //sinal para o log?
         if(quantity >= totalQuantity) {
-            totalQuantity = quantity;
+            totalQuantity = quantity; //permite expandir a quantidade total, se release for maior que total
+            //quando desaloca todos, recalcula
+            //o recálculo é feito considerando o último instante em que foi alocado e o tempo atual
             allocationRatesTimes.add(allocationRate(time, currentAllocate));
-            currentAllocate = 0;
+            currentAllocate = 0; //e zera o tempo de alocação para parar de considerar até alocar de novo
         }
     }
 
@@ -57,4 +61,7 @@ public class Resource {
         allocationRatesAverages.add(allocation);
         return allocation/currentTime;
     }
+
+    public int getId() { return this.id; }
+
 }

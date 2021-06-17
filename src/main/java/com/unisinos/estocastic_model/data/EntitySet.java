@@ -68,10 +68,18 @@ public class EntitySet {
 
     public Entity findEntity(int id) {
         Entity target = null;
-        for(int i=0; i < entities.size(); i++) {
+        for(int i = 0; i < entities.size(); i++) {
             if(entities.get(i).getId() == id) target = entities.get(i);
         }
         return target;
+    }
+
+    public int countEntity(String name) {
+        int count = 0;
+        for(int i = 0; i < entities.size(); i++) {
+            if(entities.get(i).getName() == name) count++;
+        }
+        return count;
     }
 
     public int getSize() { return size; }
@@ -122,5 +130,9 @@ public class EntitySet {
     public void getLog() {
         averageSizes.add(this.getSize());
     }
+
+    public void setEntitySetId(int id) { this.id = id; }
+
+    public int getEntitySetId() { return this.id; }
 
 }

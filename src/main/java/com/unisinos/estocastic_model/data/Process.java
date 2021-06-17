@@ -5,7 +5,7 @@ public class Process {
     private String name;
     private int processId;
     private double timeTo; //tempo até ativar
-    private double duration;
+    private double duration; //duração do processo conforme evento de definição
     private boolean active;
 
     public Process (String name, double duration) {

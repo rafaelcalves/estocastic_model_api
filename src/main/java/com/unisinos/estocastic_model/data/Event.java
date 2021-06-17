@@ -11,6 +11,8 @@ public class Event {
 
     public String getName() { return this.name; }
 
-    public int getId() { return this.eventId; }
+    public int getEventId() { return this.eventId; }
+
+    public void setEventId(int id) { this.eventId = id; }
 
 }
