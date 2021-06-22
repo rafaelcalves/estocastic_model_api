@@ -122,6 +122,15 @@ public class EntitySet {
         this.logging = true;
     }
 
+    public Entity getFirst()
+    {
+        return entities.get(0);
+    }
+
+    public void releaseFirst(){
+        entities.remove(0);
+    }
+
     public void stopLog() {
         this.logging = false;
     }
@@ -135,4 +144,8 @@ public class EntitySet {
 
     public int getEntitySetId() { return this.id; }
 
+    public String getName()
+    {
+        return name;
+    }
 }

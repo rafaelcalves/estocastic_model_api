@@ -8,12 +8,16 @@ public class Entity {
     private int id;
     private double creationTime;
     private int priority = -1; //sem prioridade = -1, mais alta = 0, mais baixa = 255
-    PetriNet net;
+    private PetriNet net;
+    private int quantity;
+    private int idPedido;
 
-    public Entity (String name, int id, double creationTime) {
+
+    public Entity (String name, int id, double creationTime, int quantity) {
         this.name = name;
         this.id = id;
         this.creationTime = creationTime;
+        this.quantity = quantity;
     }
 
     public Entity (String name, int id, double creationTime, PetriNet net) {
@@ -57,4 +61,18 @@ public class Entity {
 
     public void setPetriNet(PetriNet net) { this.net = net; }
 
+    public int getQuantity()
+    {
+        return quantity;
+    }
+
+    public int getIdPedido()
+    {
+        return idPedido;
+    }
+
+    public void setIdPedido(int idPedido)
+    {
+        this.idPedido = idPedido;
+    }
 }

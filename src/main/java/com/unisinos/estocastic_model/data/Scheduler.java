@@ -1,17 +1,37 @@
 package com.unisinos.estocastic_model.data;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+
 
 public class Scheduler {
 
+    public static final String FILA_CAIXA_1 = "filaCaixa1";
+    public static final String FILA_CAIXA_2 = "filaCaixa2";
+    public static final String FILA_MESA_2 = "filaMesa2";
+    public static final String FILA_MESA_4 = "filaMesa4";
+    public static final String FILA_BALCAO = "filaBalcao";
+    public static final String FILA_PEDIDO = "filaPedido";
     private double time;
     private ArrayList<EntitySet> entitySets;
     private ArrayList<Event> events;
     private ArrayList<Process> processes;
     private ArrayList<Resource> resources;
+    private int idIterator;
+    private List<PetriNet> waiters;
 
     private Random fRandom = new Random(); //para cálculos usando random (distribuições)
+
+    void init(){
+        entitySets.add(createEntitySet(FILA_CAIXA_1, getNextId(), "FIFO", 0));
+        entitySets.add(createEntitySet(FILA_CAIXA_2, getNextId(), "FIFO", 0));
+        entitySets.add(createEntitySet(FILA_BALCAO,getNextId(), "FIFO", 0));
+        entitySets.add(createEntitySet(FILA_MESA_2,getNextId(), "FIFO", 0));
+        entitySets.add(createEntitySet(FILA_MESA_4,getNextId(), "FIFO", 0));
+        entitySets.add(createEntitySet(FILA_PEDIDO,getNextId(), "FIFO",0));
+    }
 
     //pega o tempo do exato instante atual
     public double getTime() { return this.time; }
@@ -39,6 +59,93 @@ public class Scheduler {
             break;
         }
         return result;
+    }
+
+    public double runProcess(Process process) {
+        double result = 0;
+        switch(process.getName()) {
+            case "chegada":
+                runChegada(process);
+                break;
+            case "pedido":
+                runPedido(process);
+                break;
+            case "preparo":
+                
+                break;
+            case "refeição":
+                result = normal(20, 8);
+                break;
+            case "banheiro":
+                result = uniform(120, 180);
+                break;
+            default:
+                break;
+        }
+        return result;
+    }
+
+    private void runPedido(Process process)
+    {
+        EntitySet filaCaixa = getEntitySetByName(process.getEntitySetName());
+        Entity customer = filaCaixa.getFirst();
+        filaCaixa.releaseFirst();
+
+        EntitySet pedidos = getEntitySetByName(FILA_PEDIDO);
+        Entity pedido = createEntity("pedido", getNextId(),0,0);
+        customer.setIdPedido(pedido.getId());
+        pedidos.insert(pedido);
+
+        switch (customer.getQuantity()){
+            case 1:
+                EntitySet filaBalcao = getEntitySetByName(FILA_BALCAO);
+                filaBalcao.insert(customer);
+                break;
+            case 2:
+                EntitySet filaMesa2 = getEntitySetByName(FILA_MESA_2);
+                filaMesa2.insert(customer);
+                break;
+            default:
+                EntitySet filaMesa4 = getEntitySetByName(FILA_MESA_4);
+                filaMesa4.insert(customer);
+                break;
+        }
+        int resources = 3;
+        String processName = "preparo";
+        triggerProcess(resources, processName);
+    }
+
+    private void runChegada(Process process)
+    {
+        int customers =  1 + ((int)Math.random()) * 3;
+        Entity entity = createEntity( "cliente", getNextId(), 0, customers);
+        EntitySet filaCaixa1 = getEntitySetByName(FILA_CAIXA_1);
+        EntitySet filaCaixa2 = getEntitySetByName(FILA_CAIXA_2);
+        if(filaCaixa1.getSize() < filaCaixa2.getSize()) {
+            filaCaixa1.insert(entity);
+            process.setEntitySetName(filaCaixa1.getName());
+        }else {
+            filaCaixa2.insert(entity);
+            process.setEntitySetName(filaCaixa2.getName());
+        }
+
+        int resources = 2;
+        String processName = "pedido";
+        triggerProcess(resources, processName);
+    }
+
+    private void triggerProcess(int resources, String processName)
+    {
+        List<Process> pedidos = processes.stream()
+              .filter(pedido -> pedido.getName().equals(processName))
+              .collect(Collectors.toList());
+
+        if(pedidos.size() < resources)
+        {
+            Event eventPedido = createEvent(processName, getNextId());
+            Process processPedido = createProcess(processName, getNextId(), mapEventDuration(eventPedido));
+            processes.add(processPedido);
+        }
     }
 
     //converte um evento em um processo marcado para esse exato instante
@@ -96,7 +203,22 @@ public class Scheduler {
     public void simulateOneStep () {
         //executa somente uma primitiva da API e interrompe execução; por ex.: dispara um
         //    evento e para; insere numa fila e para, etc.
+        if(events.isEmpty()){
+            Event chegada = createEvent("chegada", idIterator++);
+            events.add(chegada);
+        } else {
+            Event event = events.get(0);
+            createProcess(event.getName(), getNextId(), mapEventDuration(event));
+        }
 
+        processes.forEach(process -> {
+            if(process.getTimeTo()>0) process.setTimeTo(process.getTimeTo() - 1);
+            if(process.getTimeTo() == 0 && process.getDuration()>0) process.setDuration(process.getDuration() - 1);
+            if(process.getDuration() == 0){
+                runProcess(process);
+                destroyProcess(process);
+            }
+        });
     }
 
     public void simulateBy(double duration) {  }
@@ -105,8 +227,8 @@ public class Scheduler {
 
     //criação, destruição e acesso para componentes
 
-    public Entity createEntity(String name, int id, int priority, PetriNet net) {
-        Entity newEntity = new Entity(name, id, this.getTime(), net);
+    public Entity createEntity(String name, int id, int priority, int quantity) {
+        Entity newEntity = new Entity(name, id, this.getTime(), quantity);
         newEntity.setPriority(priority);
         return newEntity;
     }
@@ -115,6 +237,11 @@ public class Scheduler {
     public void destroyEntity(int id) {
         for(int i = 0; i < entitySets.size(); i++) { //vai em todos os entitysets
             entitySets.get(i).removeById(id); //procura e remove
+        }
+    }
+    public void destroyProcess(Process process) {
+        for(int i = 0; i < processes.size(); i++) { //vai em todos os entitysets
+            if(processes.get(i).getProcessId() == process.getProcessId()) processes.remove(i); //procura e remove
         }
     }
 
@@ -170,12 +297,11 @@ public class Scheduler {
         return newEntitySet;
     }
 
-    public EntitySet getEntitySet(int id) {
-        EntitySet result = null;
+    public EntitySet getEntitySetByName(String name) {
         for(int i = 0; i < entitySets.size(); i++) {
-            if(entitySets.get(i).getEntitySetId() == id) result = entitySets.get(i);
+            if(entitySets.get(i).getName().equals(name)) return entitySets.get(i);
         }
-        return result;
+        return null;
     }
 
     //random variates
@@ -228,4 +354,8 @@ public class Scheduler {
         return max;
     }
 
+    public int getNextId()
+    {
+        return idIterator++;
+    }
 }
