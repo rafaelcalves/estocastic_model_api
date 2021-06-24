@@ -61,7 +61,7 @@ public class Scheduler {
         return result;
     }
 
-    public double runProcess(Process process) {
+    public void runProcess(Process process) {
         double result = 0;
         switch(process.getName()) {
             case "chegada":
@@ -71,18 +71,27 @@ public class Scheduler {
                 runPedido(process);
                 break;
             case "preparo":
-                
+                runPreparo(process);
                 break;
             case "refeição":
-                result = normal(20, 8);
+                //result = normal(20, 8);
+                //runConsumo();
+                //vai precisar receber o entity/pedido para saber qual remover e de onde?
                 break;
             case "banheiro":
-                result = uniform(120, 180);
+                //result = uniform(120, 180);
                 break;
             default:
                 break;
         }
-        return result;
+    }
+
+    //só cria um consumo quando pronto?
+    private void runPreparo(Process process)
+    {
+        Event consumir = createEvent("refeição", getNextId());
+        Process consumo = createProcess(consumir.getName(), getNextId(), mapEventDuration(consumir));
+        processes.add(consumo);
     }
 
     private void runPedido(Process process)
@@ -112,7 +121,7 @@ public class Scheduler {
         }
         int resources = 3;
         String processName = "preparo";
-        triggerProcess(resources, processName);
+        triggerPedido(resources, processName);
     }
 
     private void runChegada(Process process)
@@ -131,10 +140,10 @@ public class Scheduler {
 
         int resources = 2;
         String processName = "pedido";
-        triggerProcess(resources, processName);
+        triggerPedido(resources, processName);
     }
 
-    private void triggerProcess(int resources, String processName)
+    private void triggerPedido(int resources, String processName)
     {
         List<Process> pedidos = processes.stream()
               .filter(pedido -> pedido.getName().equals(processName))
