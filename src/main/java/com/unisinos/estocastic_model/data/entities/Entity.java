@@ -1,4 +1,6 @@
-package com.unisinos.estocastic_model.data;
+package com.unisinos.estocastic_model.data.entities;
+
+import com.unisinos.estocastic_model.data.PetriNet;
 
 import java.util.ArrayList;
 
@@ -9,15 +11,11 @@ public class Entity {
     private double creationTime;
     private int priority = -1; //sem prioridade = -1, mais alta = 0, mais baixa = 255
     private PetriNet net;
-    private int quantity;
-    private int idPedido;
 
-
-    public Entity (String name, int id, double creationTime, int quantity) {
+    public Entity (String name, int id, double creationTime) {
         this.name = name;
         this.id = id;
         this.creationTime = creationTime;
-        this.quantity = quantity;
     }
 
     public Entity (String name, int id, double creationTime, PetriNet net) {
@@ -60,19 +58,4 @@ public class Entity {
     public PetriNet getPetriNet() { return net; }
 
     public void setPetriNet(PetriNet net) { this.net = net; }
-
-    public int getQuantity()
-    {
-        return quantity;
-    }
-
-    public int getIdPedido()
-    {
-        return idPedido;
-    }
-
-    public void setIdPedido(int idPedido)
-    {
-        this.idPedido = idPedido;
-    }
 }

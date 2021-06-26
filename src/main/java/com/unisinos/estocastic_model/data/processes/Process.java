@@ -1,17 +1,18 @@
-package com.unisinos.estocastic_model.data;
+package com.unisinos.estocastic_model.data.processes;
+
+import com.unisinos.estocastic_model.data.entities.EntitySetType;
 
 public class Process {
 
-    private String name;
+    private EventType eventType;
     private int processId;
     private double timeTo; //tempo até ativar
     private double duration; //duração do processo conforme evento de definição
     private boolean active;
-    private Event event;
-    private String entitySetName;
+    private EntitySetType entitySetType;
 
-    public Process (String name, double duration) {
-        this.name = name;
+    public Process (EventType eventType, double duration) {
+        this.eventType = eventType;
         this.duration = duration;
     }
 
@@ -31,23 +32,19 @@ public class Process {
 
     public void activate(boolean active) { this.active = active; }
 
-    public String getName()
-    {
-        return name;
+    public EventType getEventType() {
+        return eventType;
     }
 
-    public Event getEvent()
-    {
-        return event;
+    public void setEventType(EventType eventType) {
+        this.eventType = eventType;
     }
 
-    public String getEntitySetName()
-    {
-        return entitySetName;
+    public EntitySetType getEntitySetType() {
+        return entitySetType;
     }
 
-    public void setEntitySetName(String entitySetName)
-    {
-        this.entitySetName = entitySetName;
+    public void setEntitySetType(EntitySetType entitySetType) {
+        this.entitySetType = entitySetType;
     }
 }

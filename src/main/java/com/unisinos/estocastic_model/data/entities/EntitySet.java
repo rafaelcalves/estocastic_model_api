@@ -1,10 +1,10 @@
-package com.unisinos.estocastic_model.data;
+package com.unisinos.estocastic_model.data.entities;
 
 import java.util.ArrayList;
 
 public class EntitySet {
 
-    private String name;
+    private EntitySetType type;
     private int id;
     private String mode = "None"; //suportados: "FIFO","LIFO","Priority based" e "None"
     private int size = 0;
@@ -14,10 +14,10 @@ public class EntitySet {
     boolean logging = false; //para controle global de se está realizando logging
     double loggingTimeGap = 5.0; //de quanto em quanto tempo vai logar
 
-    public EntitySet(String name, String mode, int maxPossibleSize) {
-        this.name = name;
-        this.mode = mode;
-        this.maxPossibleSize = maxPossibleSize;
+    public EntitySet(EntitySetType type) {
+        this.type = type;
+        this.mode = "FIFO";
+        this.maxPossibleSize = 0;
 
         //correção de modo na inicialização
         if (!mode.matches("(?i)FIFO|LIFO|Priority based|None")) {
@@ -144,8 +144,11 @@ public class EntitySet {
 
     public int getEntitySetId() { return this.id; }
 
-    public String getName()
-    {
-        return name;
+    public EntitySetType getType() {
+        return type;
+    }
+
+    public void setType(EntitySetType type) {
+        this.type = type;
     }
 }
