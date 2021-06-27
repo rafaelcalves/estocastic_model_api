@@ -26,8 +26,11 @@ public class EntitySet {
         for (int i = 0; i<this.sizes.size(); i++) {
             average += this.sizes.get(i);
         }
-        average = average/this.sizes.size();
-        return average;
+        if(this.sizes.size() != 0) {
+            average = average/this.sizes.size();
+            return average;
+        }
+        else return 0;
     }
 
     public double getAverageTimeInSet() {
@@ -35,8 +38,11 @@ public class EntitySet {
         for (int i = 0; i<this.timesToLeaveSet.size(); i++) {
             average += this.timesToLeaveSet.get(i);
         }
-        average = average/this.timesToLeaveSet.size();
-        return average;
+        if(this.timesToLeaveSet.size() != 0) {
+            average = average/this.timesToLeaveSet.size();
+            return average;
+        }
+        else return 0;
     }
 
     //tempo máximo que algo ficou no set

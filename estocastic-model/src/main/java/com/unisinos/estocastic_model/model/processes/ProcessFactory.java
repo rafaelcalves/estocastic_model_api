@@ -30,18 +30,30 @@ public class ProcessFactory {
     }
 
     private double uniform(double minValue, double maxValue) {
-
+        double result = 0.0;
         Random fRandom = new Random();
-        return minValue + (maxValue - minValue) * fRandom.nextDouble();
+        result = minValue + (maxValue - minValue) * fRandom.nextDouble();
+        return fixNegatives(result);
     }
 
     private double exponential(double meanValue) {
         Random fRandom = new Random();
-        return - (Math.log(fRandom.nextDouble()) / meanValue);
+        double result = 0.0;
+        result = - (Math.log(fRandom.nextDouble()) / meanValue);
+        return fixNegatives(result);
     }
 
     private double normal(double meanValue, double stdDeviationValue) {
         Random fRandom = new Random();
-        return meanValue + fRandom.nextGaussian()*stdDeviationValue;
+        double result = 0.0;
+        result =  meanValue + fRandom.nextGaussian()*stdDeviationValue;
+        return fixNegatives(result);
     }
+
+    private double fixNegatives(double value) {
+        double result = value;
+        if(result < 0) result *= -1;
+        return result;
+    }
+
 }

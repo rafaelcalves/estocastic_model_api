@@ -39,12 +39,12 @@ public class Scheduler {
 
     public List<EntitySet> createEntitySets(){
         List<EntitySet> newSets = new ArrayList<>();
-        entitySets.add(entitySetFactory.create(EntitySetType.CASHIER_1, getNextId()));
-        entitySets.add(entitySetFactory.create(EntitySetType.CASHIER_2, getNextId()));
-        entitySets.add(entitySetFactory.create(EntitySetType.BAR_COUNTER, getNextId()));
-        entitySets.add(entitySetFactory.create(EntitySetType.TABLE_2, getNextId()));
-        entitySets.add(entitySetFactory.create(EntitySetType.TABLE_4, getNextId()));
-        entitySets.add(entitySetFactory.create(EntitySetType.ORDER, getNextId()));
+        newSets.add(entitySetFactory.create(EntitySetType.CASHIER_1, getNextId()));
+        newSets.add(entitySetFactory.create(EntitySetType.CASHIER_2, getNextId()));
+        newSets.add(entitySetFactory.create(EntitySetType.BAR_COUNTER, getNextId()));
+        newSets.add(entitySetFactory.create(EntitySetType.TABLE_2, getNextId()));
+        newSets.add(entitySetFactory.create(EntitySetType.TABLE_4, getNextId()));
+        newSets.add(entitySetFactory.create(EntitySetType.ORDER, getNextId()));
         return newSets;
     }
 
@@ -226,14 +226,16 @@ public class Scheduler {
     public void simulateOneStep () {
         //executa somente uma primitiva da API e interrompe execução; por ex.: dispara um
         //    evento e para; insere numa fila e para, etc.
-        if(processes.isEmpty()){
-            processFactory.create(EventType.ARRIVAL, getNextId());
+        if(processes.stream().noneMatch(process -> process.getEventType().equals(EventType.ARRIVAL))) {
+            processes.add(processFactory.create(EventType.ARRIVAL, getNextId()));
         }
 
-        processes.forEach(process -> {
+        List<Process> processesSnapshot = new ArrayList<>(processes);
+
+        processesSnapshot.forEach(process -> {
             if(process.getTimeTo()>0) process.setTimeTo(process.getTimeTo() - 1);
-            if(process.getTimeTo() == 0 && process.getDuration()>0) process.setDuration(process.getDuration() - 1);
-            if(process.getDuration() == 0){
+            if(process.getTimeTo() <= 0 && process.getDuration()>0) process.setDuration(process.getDuration() - 1);
+            if(process.getDuration() <= 0){
                 runProcess(process);
             }
         });
@@ -262,17 +264,17 @@ public class Scheduler {
     }
 
     public void simulateBy(double duration) {
-        double timeFrame = getTime() + duration;
-        while(getTime() < timeFrame) {
+        double timeFrame = this.getTime() + duration;
+        while(this.getTime() < timeFrame) {
             simulateOneStep();
-            time++;
+            this.time++;
         }
     }
 
     public void simulateUntil(double absoluteTime) {
-        while(getTime() < absoluteTime) {
+        while(this.getTime() < absoluteTime) {
             simulateOneStep();
-            time++;
+            this.time++;
         }
     }
 

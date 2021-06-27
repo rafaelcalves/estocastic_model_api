@@ -8,6 +8,52 @@ public class MainTest {
     @Test
     public void main() {
 
+        Scheduler simulator = new Scheduler();
+
+        System.out.println("Simulador de restaurante. Iniciando teste com 180 minutos: \n");
+        double duration = 180;
+        simulator.simulateBy(duration);
+        getOutputFull(simulator);
+    }
+
+
+    public void getOutputFull(Scheduler simulator) {
+        System.out.println("Simulação finalizada.\n");
+
+        System.out.println("Total de clientes que passaram pelo restaurante: "
+                + simulator.getTotalCustomers() + "\n");
+        System.out.println("Tempo total de simulação: " + simulator.getTime() + "\n");
+        System.out.println("Tamanho médio Fila 1: " +
+                simulator.getEntitySetByType(EntitySetType.CASHIER_1).getAverageSize() + "\n");
+        System.out.println("Tamanho médio Fila 2: " +
+                simulator.getEntitySetByType(EntitySetType.CASHIER_2).getAverageSize() + "\n");
+        System.out.println("Tempo médio de espera na Fila do Balcão: " +
+                simulator.getEntitySetByType(EntitySetType.BAR_COUNTER).getAverageTimeInSet() + "\n");
+        System.out.println("Tempo médio de espera na Fila das Mesas de 2: " +
+                simulator.getEntitySetByType(EntitySetType.TABLE_2).getAverageTimeInSet() + "\n");
+        System.out.println("Tempo médio de espera na Fila das Mesas de 4: " +
+                simulator.getEntitySetByType(EntitySetType.TABLE_4).getAverageTimeInSet() + "\n");
+
+        System.out.println("=========================================================="
+                + "\nAdicionais para chart: \n");
+        System.out.println("Tamanho da Fila 1: " +
+                simulator.getEntitySetByType(EntitySetType.CASHIER_1).getSize() + "\n");
+        System.out.println("Tamanho da Fila 2: " +
+                simulator.getEntitySetByType(EntitySetType.CASHIER_2).getSize() + "\n");
+        System.out.println("Tamanho da Fila do Balcão: " +
+                simulator.getEntitySetByType(EntitySetType.BAR_COUNTER).getSize() + "\n");
+        System.out.println("Tamanho das Filas das Mesas: " +
+                simulator.getEntitySetByType(EntitySetType.TABLE_2).getSize()
+                + " & " + simulator.getEntitySetByType(EntitySetType.TABLE_4).getSize()
+                + "\n");
+        System.out.println("Tamanho da Fila de Pedidos: " +
+                simulator.getEntitySetByType(EntitySetType.ORDER).getSize() + "\n");
+        System.out.println("Quantidade de clientes consumindo: " +
+                simulator.getConsumptionCustomersQuantity() + "\n");
+    }
+
+    /*public void main() {
+
         Scheduler simulator = null;
         int option = -1;
 
@@ -80,5 +126,5 @@ public class MainTest {
             System.out.println("Quantidade de clientes consumindo: " +
                     simulator.getConsumptionCustomersQuantity() + "\n");
         }
-    }
+    }*/
 }
