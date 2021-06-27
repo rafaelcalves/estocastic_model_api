@@ -89,8 +89,7 @@ public class Scheduler {
     }
 
     private CustomerEntity startConsumption(Entity order) {
-        EntitySetType entitySetType = EntitySetType.BAR_COUNTER;
-        CustomerEntity customer = popCustomerFromEntitySetByOrderAndType(order, entitySetType);
+        CustomerEntity customer = popCustomerFromEntitySetByOrderAndType(order, EntitySetType.BAR_COUNTER);
         if(customer!=null) return customer;
         customer = popCustomerFromEntitySetByOrderAndType(order, EntitySetType.TABLE_2);
         if(customer!=null) return customer;
@@ -243,6 +242,7 @@ public class Scheduler {
 
     public void log(){
         entitySets.forEach(EntitySet::logSize);
+        lastLog = getTime();
     }
 
     public void simulateBy(double duration) {  }

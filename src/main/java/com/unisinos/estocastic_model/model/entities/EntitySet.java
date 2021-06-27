@@ -21,7 +21,7 @@ public class EntitySet {
     }
 
     //pega média de tamanhos do set (histórica)
-    public double averageSize() {
+    public double getAverageSize() {
         int average = 0;
         for (int i = 0; i<this.sizes.size(); i++) {
             average += this.sizes.get(i);
@@ -30,7 +30,7 @@ public class EntitySet {
         return average;
     }
 
-    public double averageTimeInSet() {
+    public double getAverageTimeInSet() {
         int average = 0;
         for (int i = 0; i<this.timesToLeaveSet.size(); i++) {
             average += this.timesToLeaveSet.get(i);
@@ -40,14 +40,15 @@ public class EntitySet {
     }
 
     //tempo máximo que algo ficou no set
-    public double maxTimeInSet(double current) {
+    public double maxTimeInSet() {
         return highestTimeToLeaveSet;
     }
 
     public void insert(Entity entity) {
         this.entities.add(entity);
-        if(getSize()>highestSize) highestSize =getSize();
+        if(getSize()>highestSize) highestSize = getSize();
     }
+
     public void remove(Entity entity, double currentTime) {
         if (!this.entities.isEmpty()) {
             logTime(entity, currentTime);
