@@ -5,13 +5,14 @@ import com.unisinos.estocastic_model.model.entities.EntitySetType;
 public class Process {
 
     private EventType eventType;
-    private int processId;
+    private int id;
     private double timeTo; //tempo até ativar
     private double duration; //duração do processo conforme evento de definição
     private boolean active;
     private EntitySetType entitySetType;
 
-    public Process (EventType eventType, double duration) {
+    public Process (int id, EventType eventType, double duration) {
+        this.id = id;
         this.eventType = eventType;
         this.duration = duration;
     }
@@ -24,9 +25,7 @@ public class Process {
 
     public void setTimeTo(double timeTo) { this.timeTo = timeTo; }
 
-    public int getProcessId () { return this.processId; }
-
-    public void setProcessId(int id) { this.processId = id; }
+    public int getId() { return this.id; }
 
     public boolean isActive() { return active; }
 
@@ -34,10 +33,6 @@ public class Process {
 
     public EventType getEventType() {
         return eventType;
-    }
-
-    public void setEventType(EventType eventType) {
-        this.eventType = eventType;
     }
 
     public EntitySetType getEntitySetType() {

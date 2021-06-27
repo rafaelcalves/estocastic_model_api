@@ -4,10 +4,12 @@ import com.unisinos.estocastic_model.model.entities.EntitySetType;
 
 public class ConsumptionProcess extends Process {
     private EntitySetType tableType;
+    private int customersQuantity;
 
-    public ConsumptionProcess(EventType eventType, double duration, EntitySetType tableType) {
-        super(eventType, duration);
+    public ConsumptionProcess(int id, EventType eventType, double duration, EntitySetType tableType, int customersQuantity) {
+        super(id, eventType, duration);
         this.tableType = tableType;
+        this.customersQuantity = customersQuantity;
     }
 
     public EntitySetType getTableType() {
@@ -16,5 +18,13 @@ public class ConsumptionProcess extends Process {
 
     public void setTableType(EntitySetType tableType) {
         this.tableType = tableType;
+    }
+
+    public int getCustomersQuantity() {
+        return customersQuantity;
+    }
+
+    public void setCustomersQuantity(int customersQuantity) {
+        this.customersQuantity = customersQuantity;
     }
 }

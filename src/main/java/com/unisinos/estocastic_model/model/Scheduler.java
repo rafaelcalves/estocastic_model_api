@@ -11,18 +11,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
 public class Scheduler {
 
     private double time;
+    private double lastLog;
     private List<EntitySet> entitySets;
     private List<Process> processes;
-    private List<Resource> resources;
     private int idIterator;
     private List<PetriNet> waiters;
     private ProcessFactory processFactory;
     private EntitySetFactory entitySetFactory;
     private EntityFactory entityFactory;
+
+    private int totalCustomers;
 
     Scheduler(){
         init();
@@ -47,10 +48,7 @@ public class Scheduler {
         return newSets;
     }
 
-    //pega o tempo do exato instante atual
     public double getTime() { return this.time; }
-
-    //dependendo do tipo de evento, calcula tempo para iniciar
 
     public void runProcess(Process process) {
         switch(process.getEventType()) {
@@ -74,7 +72,7 @@ public class Scheduler {
     private void runConsumption(Process process){
         ConsumptionProcess consumption = (ConsumptionProcess) process;
         EntitySet tableSet = getEntitySetByType(consumption.getTableType());
-        tableSet.releaseFirst();
+        tableSet.releaseFirst(getTime());
         destroyProcess(consumption);
     }
 
@@ -86,7 +84,7 @@ public class Scheduler {
         CustomerEntity customer = startConsumption(order);
         if(customer!=null) {
             destroyProcess(process);
-            ordersLine.releaseFirst();
+            ordersLine.releaseFirst(getTime());
         }
     }
 
@@ -108,8 +106,8 @@ public class Scheduler {
         return filteredProcesses.size() < tableType.getResources();
     }
 
-    private void triggerConsumption(EntitySetType tableType) {
-        Process consumption = processFactory.createConsumption(getNextId(), tableType);
+    private void triggerConsumption(EntitySetType tableType, CustomerEntity customer) {
+        Process consumption = processFactory.createConsumption(getNextId(), tableType, customer.getQuantity());
         processes.add(consumption);
     }
 
@@ -117,7 +115,7 @@ public class Scheduler {
         Optional<CustomerEntity> optionalCustomer;
         optionalCustomer = getCustomerByOrder(order, entitySetType);
         if(canTriggerConsumption(entitySetType)) {
-            triggerConsumption(entitySetType);
+            triggerConsumption(entitySetType, optionalCustomer.get());
             return optionalCustomer.map(customerEntity -> popFromEntitySet(customerEntity, entitySetType)).orElse(null);
         }
         return null;
@@ -125,7 +123,7 @@ public class Scheduler {
 
     private CustomerEntity popFromEntitySet(CustomerEntity customer, EntitySetType entitySetType) {
         EntitySet entitySet = getEntitySetByType(entitySetType);
-        entitySet.remove(customer);
+        entitySet.remove(customer, getTime());
         return customer;
     }
 
@@ -142,7 +140,7 @@ public class Scheduler {
     {
         EntitySet cashierLine = getEntitySetByType(process.getEntitySetType());
         CustomerEntity customer = (CustomerEntity)cashierLine.getFirst();
-        cashierLine.releaseFirst();
+        cashierLine.releaseFirst(getTime());
 
         EntitySet orders = getEntitySetByType(EntitySetType.ORDER);
         Entity order = entityFactory.createOrder(getNextId(),getTime());
@@ -170,6 +168,7 @@ public class Scheduler {
     private void runArrival(Process process)
     {
         int customers =  1 + ((int)Math.random()) * 3;
+        totalCustomers+=customers;
         CustomerEntity entity = entityFactory.createCustomer(getNextId(), 0, customers);
         EntitySet cashier1Line = getEntitySetByType(EntitySetType.CASHIER_1);
         EntitySet cashier2Line = getEntitySetByType(EntitySetType.CASHIER_2);
@@ -198,7 +197,24 @@ public class Scheduler {
         }
     }
 
-    //espera por um tempo
+    public void destroyProcess(Process process) {
+        for(int i = 0; i < processes.size(); i++) { //vai em todos os entitysets
+            if(processes.get(i).getId() == process.getId()) processes.remove(i); //procura e remove
+        }
+    }
+
+    public EntitySet getEntitySetByType(EntitySetType type) {
+        for(int i = 0; i < entitySets.size(); i++) {
+            if(entitySets.get(i).getType().equals(type)) return entitySets.get(i);
+        }
+        return null;
+    }
+
+    public int getNextId()
+    {
+        return idIterator++;
+    }
+
     public void waitFor(double time) {
         this.time += time;
     }
@@ -222,94 +238,28 @@ public class Scheduler {
                 runProcess(process);
             }
         });
+        if(time == lastLog + Constants.LOG_PERIOD)log();
+    }
+
+    public void log(){
+        entitySets.forEach(EntitySet::logSize);
     }
 
     public void simulateBy(double duration) {  }
 
     public void simulateUntil(double absoluteTime) {  }
 
-    //criação, destruição e acesso para componentes
-
-    //a princípio IDs vão ser todos únicos
-    public void destroyEntity(int id) {
-        for(int i = 0; i < entitySets.size(); i++) { //vai em todos os entitysets
-            entitySets.get(i).removeById(id); //procura e remove
-        }
-    }
-    public void destroyProcess(Process process) {
-        for(int i = 0; i < processes.size(); i++) { //vai em todos os entitysets
-            if(processes.get(i).getProcessId() == process.getProcessId()) processes.remove(i); //procura e remove
-        }
-    }
-
-    //a princípio IDs vão ser todos únicos
-    public Entity getEntity(int id) {
-        Entity temp = null; //inicia com "ponteiro" vazio
-        for(int i = 0; i < entitySets.size(); i++) { //vai em todas as entitysets
-            temp = entitySets.get(i).findEntity(id); //procura e passa pro ponteiro
-        }
-        return temp;
-    }
-
-    //o createResource(name, quantity):id -- revisar. Precisa retornar ID??
-    public Resource createResource(String name, int id, int quantity) {
-        Resource newResource = new Resource(name, id, quantity);
-        return newResource;
-    }
-
-    public Resource getResource(int id) {
-        Resource result = null;
-        for(int i = 0; i < resources.size(); i++) {
-            if(resources.get(i).getId() == id) result = resources.get(i);
-        }
-        return result;
-    }
-
-    public EntitySet getEntitySetByType(EntitySetType type) {
-        for(int i = 0; i < entitySets.size(); i++) {
-            if(entitySets.get(i).getType().equals(type)) return entitySets.get(i);
-        }
-        return null;
-    }
-
     //coleta de estatísticas
 
-    public int getEntityTotalQuantity() {
-        int totalEntities = 0;
-        for(int i = 0; i < entitySets.size(); i++) {
-            totalEntities += entitySets.get(i).getSize();
-        }
-        return totalEntities;
+    public int getTotalCustomers() {
+        return totalCustomers;
     }
 
-    public int getEntityTotalQuantityNamed(String name) {
-        int totalEntities = 0;
-        for(int i = 0; i < entitySets.size(); i++) {
-            totalEntities += entitySets.get(i).countEntity(name);
-        }
-        return totalEntities;
+    public int getConsumptionCustomersQuantity(){
+        return processes.stream()
+            .filter(process -> process instanceof ConsumptionProcess)
+            .map(process -> ((ConsumptionProcess)process).getCustomersQuantity())
+            .reduce(0, Integer::sum);
     }
 
-    public double averageTimeInModel() {
-        double average = 0;
-        int amount = 0;
-        for(int i = 0; i < entitySets.size(); i++) {
-            average += entitySets.get(i).averageTimeInSet(this.getTime());
-            amount++;
-        }
-        return average/amount;
-    }
-
-    public int maxEntitiesPresent() {
-        int max = 0;
-        for(int i = 0; i < entitySets.size(); i++) {
-            max += entitySets.get(i).getMaxPossibleSize();
-        }
-        return max;
-    }
-
-    public int getNextId()
-    {
-        return idIterator++;
-    }
 }

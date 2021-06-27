@@ -6,14 +6,10 @@ import java.util.Random;
 
 public class ProcessFactory {
     public Process create(EventType eventType, int id){
-        Process newProcess = new Process(eventType, getProcessDurationByEventType(eventType));
-        newProcess.setProcessId(id);
-        return newProcess;
+        return new Process(id,eventType, getProcessDurationByEventType(eventType));
     }
-    public ConsumptionProcess createConsumption(int id, EntitySetType tableType){
-        ConsumptionProcess consumption = (ConsumptionProcess) create(EventType.CONSUMPTION, id);
-        consumption.setTableType(tableType);
-        return consumption;
+    public ConsumptionProcess createConsumption(int id, EntitySetType tableType, int customersQuantity){
+        return new ConsumptionProcess(id, EventType.CONSUMPTION, getProcessDurationByEventType(EventType.CONSUMPTION),tableType, customersQuantity);
     }
 
     private double getProcessDurationByEventType(EventType eventType) {

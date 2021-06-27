@@ -6,4 +6,6 @@ public final class Constants {
     public static final int BAR_COUNTER_RESOURCES = 6;
     public static final int TABLE_2_RESOURCES = 4;
     public static final int TABLE_4_RESOURCES = 4;
+
+    public static final int LOG_PERIOD = 5;
 }
