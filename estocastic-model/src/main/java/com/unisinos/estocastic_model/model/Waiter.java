@@ -14,6 +14,11 @@ public class Waiter {
     public static final String CUSTOMER_GOING_TO_SEAT = "4";
     public static final String TABLE_CLEANED = "10";
 
+    public static final String ON_CASHIER = "5";
+    public static final String DELIVERING_ORDER = "7";
+    public static final String CLEANING_TABLE = "9";
+    public static final String AVAILABLE = "1";
+
     private final PFLOWImporter importer = new PFLOWImporter();
     private final CycleService cycleService = new CycleService();
 
@@ -27,8 +32,20 @@ public class Waiter {
         cycleService.runCycles(document,1);
     }
 
-    public boolean isWaiterAvailable() {
-        return document.isFinished();
+    public boolean isAvailable(){
+        return document.getPlaceById(AVAILABLE).getToken() > 0;
+    }
+
+    public boolean isWaitingCashierReturns(){
+        return document.getPlaceById(ON_CASHIER).getToken() > 0;
+    }
+
+    public boolean isCleaningTable(){
+        return document.getPlaceById(CLEANING_TABLE).getToken() > 0;
+    }
+
+    public boolean isDeliveringOrder(){
+        return document.getPlaceById(DELIVERING_ORDER).getToken() > 0;
     }
 
     public void addCashierReplacement(){
@@ -47,7 +64,7 @@ public class Waiter {
         allocateToken(ORDER_ARRIVES,1);
     }
 
-    public void addCCustomerGoingToSeat(){
+    public void addCustomerGoingToSeat(){
         allocateToken(CUSTOMER_GOING_TO_SEAT,1);
     }
 
