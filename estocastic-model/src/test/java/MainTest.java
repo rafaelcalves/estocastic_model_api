@@ -1,13 +1,12 @@
-package com.unisinos.estocastic_model;
-
-import com.unisinos.estocastic_model.model.*;
+import com.unisinos.estocastic_model.model.Scheduler;
 import com.unisinos.estocastic_model.model.entities.EntitySetType;
+import org.junit.Test;
 
 import java.util.Scanner;
 
-public class Main {
-
-    public void main(String[] args) {
+public class MainTest {
+    @Test
+    public void main() {
 
         Scheduler simulator = null;
         int option = -1;
@@ -37,6 +36,7 @@ public class Main {
         }
     }
 
+
     public void getOutput(Scheduler simulator) {
         System.out.println("Simulação finalizada.\n");
 
@@ -64,7 +64,7 @@ public class Main {
 
         if(option != 2) {
             System.out.println("=========================================================="
-                            + "\nAdicionais para chart: \n");
+                    + "\nAdicionais para chart: \n");
             System.out.println("Tamanho da Fila 1: " +
                     simulator.getEntitySetByType(EntitySetType.CASHIER_1).getSize() + "\n");
             System.out.println("Tamanho da Fila 2: " +
@@ -81,5 +81,4 @@ public class Main {
                     simulator.getConsumptionCustomersQuantity() + "\n");
         }
     }
-
 }
