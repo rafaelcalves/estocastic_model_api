@@ -1,4 +1,4 @@
-package com.unisinos.estocastic_model.model;
+package com.unisinos.estocastic_model.model.waiters;
 
 import com.unisinos.petrinet.models.Document;
 import com.unisinos.petrinet.pflowimport.PFLOWImporter;
@@ -33,19 +33,23 @@ public class Waiter {
     }
 
     public boolean isAvailable(){
-        return document.getPlaceById(AVAILABLE).getToken() > 0;
+        return getTokensForId(AVAILABLE) > 0;
     }
 
     public boolean isWaitingCashierReturns(){
-        return document.getPlaceById(ON_CASHIER).getToken() > 0;
+        return getTokensForId(ON_CASHIER) > 0;
+    }
+
+    private Integer getTokensForId(String placeId) {
+        return document.getPlaceById(placeId).getToken();
     }
 
     public boolean isCleaningTable(){
-        return document.getPlaceById(CLEANING_TABLE).getToken() > 0;
+        return getTokensForId(CLEANING_TABLE) > 0;
     }
 
     public boolean isDeliveringOrder(){
-        return document.getPlaceById(DELIVERING_ORDER).getToken() > 0;
+        return getTokensForId(DELIVERING_ORDER) > 0;
     }
 
     public void addCashierReplacement(){
@@ -74,6 +78,10 @@ public class Waiter {
 
     private void allocateToken(String id, int tokens) {
         document.setPlaceTokenById(id, tokens);
+    }
+
+    public int getTotalPendingTasks(){
+        return getTokensForId(CASHIER_NEEDS_REPLACE) + getTokensForId(ORDER_READY) + getTokensForId(CUSTOMER_GOING_TO_SEAT);
     }
 
 }

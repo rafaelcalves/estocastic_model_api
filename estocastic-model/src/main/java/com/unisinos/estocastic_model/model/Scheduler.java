@@ -5,7 +5,10 @@ import com.unisinos.estocastic_model.model.processes.ConsumptionProcess;
 import com.unisinos.estocastic_model.model.processes.EventType;
 import com.unisinos.estocastic_model.model.processes.Process;
 import com.unisinos.estocastic_model.model.processes.ProcessFactory;
+import com.unisinos.estocastic_model.model.waiters.Waiter;
+import com.unisinos.estocastic_model.model.waiters.WaiterHandler;
 
+import javax.xml.bind.JAXBException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,19 +25,23 @@ public class Scheduler {
     private ProcessFactory processFactory;
     private EntitySetFactory entitySetFactory;
     private EntityFactory entityFactory;
+    private WaiterHandler waiterHandler;
 
     private int totalCustomers;
 
-    public Scheduler(){
+    public Scheduler() throws JAXBException {
         init();
     }
 
-    void init(){
+    void init() throws JAXBException {
         processFactory = new ProcessFactory();
         entitySetFactory = new EntitySetFactory();
         entityFactory = new EntityFactory();
-        entitySets = createEntitySets();
+        waiterHandler = new WaiterHandler();
         processes = new ArrayList<>();
+
+        entitySets = createEntitySets();
+        waiters = createWaiters();
     }
 
     public List<EntitySet> createEntitySets(){
@@ -46,6 +53,13 @@ public class Scheduler {
         newSets.add(entitySetFactory.create(EntitySetType.TABLE_4, getNextId()));
         newSets.add(entitySetFactory.create(EntitySetType.ORDER, getNextId()));
         return newSets;
+    }
+
+    public List<Waiter> createWaiters() throws JAXBException {
+        List<Waiter> newWaiters = new ArrayList<>();
+        newWaiters.add(new Waiter());
+        newWaiters.add(new Waiter());
+        return createWaiters();
     }
 
     public double getTime() { return this.time; }
@@ -239,6 +253,8 @@ public class Scheduler {
                 runProcess(process);
             }
         });
+
+        waiterHandler.runWaitersCycle(waiters);
         if(time == lastLog + Constants.LOG_PERIOD)log();
     }
 

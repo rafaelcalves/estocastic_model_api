@@ -1,4 +1,4 @@
-import com.unisinos.estocastic_model.model.Waiter;
+import com.unisinos.estocastic_model.model.waiters.Waiter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
