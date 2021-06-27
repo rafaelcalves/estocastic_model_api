@@ -1,19 +1,19 @@
 package com.unisinos.estocastic_model.data;
 
 import com.unisinos.estocastic_model.data.entities.*;
+import com.unisinos.estocastic_model.data.processes.ConsumptionProcess;
 import com.unisinos.estocastic_model.data.processes.EventType;
 import com.unisinos.estocastic_model.data.processes.Process;
 import com.unisinos.estocastic_model.data.processes.ProcessFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
 public class Scheduler {
 
-    public static final int ORDER_PREPARATION_LIMIT = 3;
-    public static final int CASHIER_ATTENDANCE_LIMIT = 2;
     private double time;
     private List<EntitySet> entitySets;
     private List<Process> processes;
@@ -38,12 +38,12 @@ public class Scheduler {
 
     public List<EntitySet> createEntitySets(){
         List<EntitySet> newSets = new ArrayList<>();
-        entitySets.add(entitySetFactory.create(EntitySetType.CAIXA_1, getNextId()));
-        entitySets.add(entitySetFactory.create(EntitySetType.CAIXA_2, getNextId()));
-        entitySets.add(entitySetFactory.create(EntitySetType.BALCAO, getNextId()));
-        entitySets.add(entitySetFactory.create(EntitySetType.MESA_2, getNextId()));
-        entitySets.add(entitySetFactory.create(EntitySetType.MESA_4, getNextId()));
-        entitySets.add(entitySetFactory.create(EntitySetType.PEDIDO, getNextId()));
+        entitySets.add(entitySetFactory.create(EntitySetType.CASHIER_1, getNextId()));
+        entitySets.add(entitySetFactory.create(EntitySetType.CASHIER_2, getNextId()));
+        entitySets.add(entitySetFactory.create(EntitySetType.BAR_COUNTER, getNextId()));
+        entitySets.add(entitySetFactory.create(EntitySetType.TABLE_2, getNextId()));
+        entitySets.add(entitySetFactory.create(EntitySetType.TABLE_4, getNextId()));
+        entitySets.add(entitySetFactory.create(EntitySetType.ORDER, getNextId()));
         return newSets;
     }
 
@@ -65,9 +65,6 @@ public class Scheduler {
                 break;
             case CONSUMPTION:
                 runConsumption(process);
-                //vai precisar receber o entity/pedido para saber qual remover e de onde?
-                break;
-            case WC:
                 break;
             default:
                 break;
@@ -75,74 +72,129 @@ public class Scheduler {
     }
 
     private void runConsumption(Process process){
-
+        ConsumptionProcess consumption = (ConsumptionProcess) process;
+        EntitySet tableSet = getEntitySetByType(consumption.getTableType());
+        tableSet.releaseFirst();
+        destroyProcess(consumption);
     }
 
-    //só cria um consumo quando pronto?
     private void runPreparation(Process process)
     {
-        EntitySet filaPedido = getEntitySetByType(EntitySetType.PEDIDO);
-        Entity pedido = filaPedido.getFirst();
+        EntitySet ordersLine = getEntitySetByType(EntitySetType.ORDER);
+        Entity order = ordersLine.getFirst();
 
-        Process consumo = processFactory.create(EventType.CONSUMPTION, getNextId());
-        processes.add(consumo);
+        CustomerEntity customer = startConsumption(order);
+        if(customer!=null) {
+            destroyProcess(process);
+            ordersLine.releaseFirst();
+        }
+    }
+
+    private CustomerEntity startConsumption(Entity order) {
+        EntitySetType entitySetType = EntitySetType.BAR_COUNTER;
+        CustomerEntity customer = popCustomerFromEntitySetByOrderAndType(order, entitySetType);
+        if(customer!=null) return customer;
+        customer = popCustomerFromEntitySetByOrderAndType(order, EntitySetType.TABLE_2);
+        if(customer!=null) return customer;
+        return popCustomerFromEntitySetByOrderAndType(order, EntitySetType.TABLE_4);
+    }
+
+    private boolean canTriggerConsumption(EntitySetType tableType) {
+        List<Process> filteredProcesses = processes.stream()
+                .filter(process -> process instanceof ConsumptionProcess)
+                .map(ConsumptionProcess.class::cast)
+                .filter(consumptionProcess -> consumptionProcess.getTableType().equals(tableType))
+                .collect(Collectors.toList());
+        return filteredProcesses.size() < tableType.getResources();
+    }
+
+    private void triggerConsumption(EntitySetType tableType) {
+        Process consumption = processFactory.createConsumption(getNextId(), tableType);
+        processes.add(consumption);
+    }
+
+    private CustomerEntity popCustomerFromEntitySetByOrderAndType(Entity order, EntitySetType entitySetType) {
+        Optional<CustomerEntity> optionalCustomer;
+        optionalCustomer = getCustomerByOrder(order, entitySetType);
+        if(canTriggerConsumption(entitySetType)) {
+            triggerConsumption(entitySetType);
+            return optionalCustomer.map(customerEntity -> popFromEntitySet(customerEntity, entitySetType)).orElse(null);
+        }
+        return null;
+    }
+
+    private CustomerEntity popFromEntitySet(CustomerEntity customer, EntitySetType entitySetType) {
+        EntitySet entitySet = getEntitySetByType(entitySetType);
+        entitySet.remove(customer);
+        return customer;
+    }
+
+    private Optional<CustomerEntity> getCustomerByOrder(Entity order, EntitySetType entitySetType) {
+        return getEntitySetByType(entitySetType).getEntities()
+                .stream()
+                .filter(entity -> entity instanceof CustomerEntity)
+                .map(CustomerEntity.class::cast)
+                .filter(customerEntity -> customerEntity.getOrderId() == order.getId())
+                .findFirst();
     }
 
     private void runOrder(Process process)
     {
-        EntitySet filaCaixa = getEntitySetByType(process.getEntitySetType());
-        CustomerEntity customer = (CustomerEntity)filaCaixa.getFirst();
-        filaCaixa.releaseFirst();
+        EntitySet cashierLine = getEntitySetByType(process.getEntitySetType());
+        CustomerEntity customer = (CustomerEntity)cashierLine.getFirst();
+        cashierLine.releaseFirst();
 
-        EntitySet pedidos = getEntitySetByType(EntitySetType.PEDIDO);
-        Entity pedido = entityFactory.createOrder(getNextId(),getTime());
-        customer.setOrderId(pedido.getId());
-        pedidos.insert(pedido);
+        EntitySet orders = getEntitySetByType(EntitySetType.ORDER);
+        Entity order = entityFactory.createOrder(getNextId(),getTime());
+        customer.setOrderId(order.getId());
+        orders.insert(order);
 
         switch (customer.getQuantity()){
             case 1:
-                EntitySet filaBalcao = getEntitySetByType(EntitySetType.BALCAO);
-                filaBalcao.insert(customer);
+                EntitySet barCounterLine = getEntitySetByType(EntitySetType.BAR_COUNTER);
+                barCounterLine.insert(customer);
                 break;
             case 2:
-                EntitySet filaMesa2 = getEntitySetByType(EntitySetType.MESA_2);
-                filaMesa2.insert(customer);
+                EntitySet tableFor2Line = getEntitySetByType(EntitySetType.TABLE_2);
+                tableFor2Line.insert(customer);
                 break;
             default:
-                EntitySet filaMesa4 = getEntitySetByType(EntitySetType.MESA_4);
-                filaMesa4.insert(customer);
+                EntitySet tableFor4Line = getEntitySetByType(EntitySetType.TABLE_4);
+                tableFor4Line.insert(customer);
                 break;
         }
-        triggerOrder(ORDER_PREPARATION_LIMIT, EventType.PREPARATION);
+        triggerOrder(EventType.PREPARATION);
+        destroyProcess(process);
     }
 
     private void runArrival(Process process)
     {
         int customers =  1 + ((int)Math.random()) * 3;
         CustomerEntity entity = entityFactory.createCustomer(getNextId(), 0, customers);
-        EntitySet filaCaixa1 = getEntitySetByType(EntitySetType.CAIXA_1);
-        EntitySet filaCaixa2 = getEntitySetByType(EntitySetType.CAIXA_2);
-        if(filaCaixa1.getSize() < filaCaixa2.getSize()) {
-            filaCaixa1.insert(entity);
-            process.setEntitySetType(filaCaixa1.getType());
+        EntitySet cashier1Line = getEntitySetByType(EntitySetType.CASHIER_1);
+        EntitySet cashier2Line = getEntitySetByType(EntitySetType.CASHIER_2);
+        if(cashier1Line.getSize() < cashier2Line.getSize()) {
+            cashier1Line.insert(entity);
+            process.setEntitySetType(cashier1Line.getType());
         }else {
-            filaCaixa2.insert(entity);
-            process.setEntitySetType(filaCaixa2.getType());
+            cashier2Line.insert(entity);
+            process.setEntitySetType(cashier2Line.getType());
         }
 
-        triggerOrder(CASHIER_ATTENDANCE_LIMIT, EventType.ORDER);
+        triggerOrder(EventType.ORDER);
+        destroyProcess(process);
     }
 
-    private void triggerOrder(int resources, EventType eventType)
+    private void triggerOrder(EventType eventType)
     {
-        List<Process> pedidos = processes.stream()
-              .filter(pedido -> pedido.getEventType().equals(eventType))
+        List<Process> orders = processes.stream()
+              .filter(order -> order.getEventType().equals(eventType))
               .collect(Collectors.toList());
 
-        if(pedidos.size() < resources)
+        if(orders.size() < eventType.getResources())
         {
-            Process processPedido = processFactory.create(eventType, getNextId());
-            processes.add(processPedido);
+            Process processOrder = processFactory.create(eventType, getNextId());
+            processes.add(processOrder);
         }
     }
 
@@ -168,7 +220,6 @@ public class Scheduler {
             if(process.getTimeTo() == 0 && process.getDuration()>0) process.setDuration(process.getDuration() - 1);
             if(process.getDuration() == 0){
                 runProcess(process);
-                destroyProcess(process);
             }
         });
     }

@@ -1,6 +1,7 @@
 package com.unisinos.estocastic_model.data.entities;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class EntitySet {
 
@@ -8,9 +9,9 @@ public class EntitySet {
     private int id;
     private String mode = "None"; //suportados: "FIFO","LIFO","Priority based" e "None"
     private int size = 0;
-    private ArrayList<Integer> averageSizes; //para pegar média de tamanhos
+    private List<Integer> averageSizes; //para pegar média de tamanhos
     private int maxPossibleSize = 0; //0 = ilimitado
-    private ArrayList<Entity> entities; //rever tipos - arraylist é o ideal ou não?
+    private List<Entity> entities; //rever tipos - arraylist é o ideal ou não?
     boolean logging = false; //para controle global de se está realizando logging
     double loggingTimeGap = 5.0; //de quanto em quanto tempo vai logar
 
@@ -18,6 +19,7 @@ public class EntitySet {
         this.type = type;
         this.mode = "FIFO";
         this.maxPossibleSize = 0;
+        entities = new ArrayList<>();
 
         //correção de modo na inicialização
         if (!mode.matches("(?i)FIFO|LIFO|Priority based|None")) {
@@ -49,6 +51,12 @@ public class EntitySet {
             this.size--;
         }
         return output;
+    }
+
+    public void remove(Entity entity) {
+        if (!this.entities.isEmpty()) {
+            entities.remove(entity);
+        }
     }
 
     public void removeById(int id) {
@@ -150,5 +158,13 @@ public class EntitySet {
 
     public void setType(EntitySetType type) {
         this.type = type;
+    }
+
+    public List<Entity> getEntities() {
+        return entities;
+    }
+
+    public void setEntities(List<Entity> entities) {
+        this.entities = entities;
     }
 }

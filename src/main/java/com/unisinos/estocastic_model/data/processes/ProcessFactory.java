@@ -1,5 +1,7 @@
 package com.unisinos.estocastic_model.data.processes;
 
+import com.unisinos.estocastic_model.data.entities.EntitySetType;
+
 import java.util.Random;
 
 public class ProcessFactory {
@@ -7,6 +9,11 @@ public class ProcessFactory {
         Process newProcess = new Process(eventType, getProcessDurationByEventType(eventType));
         newProcess.setProcessId(id);
         return newProcess;
+    }
+    public ConsumptionProcess createConsumption(int id, EntitySetType tableType){
+        ConsumptionProcess consumption = (ConsumptionProcess) create(EventType.CONSUMPTION, id);
+        consumption.setTableType(tableType);
+        return consumption;
     }
 
     private double getProcessDurationByEventType(EventType eventType) {
