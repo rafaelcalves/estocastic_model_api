@@ -242,7 +242,8 @@ public class Scheduler {
 
     public void log(){
         logSizes();
-        logTimes();
+        //Not needed since removing should do it.
+        //logTimes();
         lastLog = getTime();
     }
 
