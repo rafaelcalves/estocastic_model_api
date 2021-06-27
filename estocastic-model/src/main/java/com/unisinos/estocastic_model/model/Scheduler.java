@@ -113,7 +113,7 @@ public class Scheduler {
     private CustomerEntity popCustomerFromEntitySetByOrderAndType(Entity order, EntitySetType entitySetType) {
         Optional<CustomerEntity> optionalCustomer;
         optionalCustomer = getCustomerByOrder(order, entitySetType);
-        if(canTriggerConsumption(entitySetType)) {
+        if(optionalCustomer.isPresent() && canTriggerConsumption(entitySetType)) {
             triggerConsumption(entitySetType, optionalCustomer.get());
             return optionalCustomer.map(customerEntity -> popFromEntitySet(customerEntity, entitySetType)).orElse(null);
         }
@@ -160,13 +160,14 @@ public class Scheduler {
                 tableFor4Line.insert(customer);
                 break;
         }
+        customer.getTimeSinceEntrance(getTime());
         triggerOrder(EventType.PREPARATION);
         destroyProcess(process);
     }
 
     private void runArrival(Process process)
     {
-        int customers =  1 + ((int)Math.random()) * 3;
+        int customers =  1 + (int)(Math.random() * 3);
         totalCustomers+=customers;
         CustomerEntity entity = entityFactory.createCustomer(getNextId(), getTime(), customers);
         EntitySet cashier1Line = getEntitySetByType(EntitySetType.CASHIER_1);
