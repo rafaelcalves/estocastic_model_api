@@ -168,7 +168,7 @@ public class Scheduler {
     {
         int customers =  1 + ((int)Math.random()) * 3;
         totalCustomers+=customers;
-        CustomerEntity entity = entityFactory.createCustomer(getNextId(), 0, customers);
+        CustomerEntity entity = entityFactory.createCustomer(getNextId(), getTime(), customers);
         EntitySet cashier1Line = getEntitySetByType(EntitySetType.CASHIER_1);
         EntitySet cashier2Line = getEntitySetByType(EntitySetType.CASHIER_2);
         EntitySetType smallerEntitySetType;
