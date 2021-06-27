@@ -1,4 +1,4 @@
-package com.unisinos.estocastic_model.data.entities;
+package com.unisinos.estocastic_model.model.entities;
 
 import java.util.ArrayList;
 import java.util.List;

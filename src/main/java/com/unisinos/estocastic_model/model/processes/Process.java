@@ -1,6 +1,6 @@
-package com.unisinos.estocastic_model.data.processes;
+package com.unisinos.estocastic_model.model.processes;
 
-import com.unisinos.estocastic_model.data.entities.EntitySetType;
+import com.unisinos.estocastic_model.model.entities.EntitySetType;
 
 public class Process {
 

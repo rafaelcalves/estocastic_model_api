@@ -1,4 +1,4 @@
-package com.unisinos.estocastic_model.data;
+package com.unisinos.estocastic_model.model;
 
 public final class Constants {
     public static final int ORDER_PREPARATION_RESOURCES = 3;

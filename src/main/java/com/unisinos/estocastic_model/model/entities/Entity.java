@@ -1,6 +1,6 @@
-package com.unisinos.estocastic_model.data.entities;
+package com.unisinos.estocastic_model.model.entities;
 
-import com.unisinos.estocastic_model.data.PetriNet;
+import com.unisinos.estocastic_model.model.PetriNet;
 
 import java.util.ArrayList;
 

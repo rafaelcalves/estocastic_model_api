@@ -1,4 +1,4 @@
-package com.unisinos.estocastic_model.data;
+package com.unisinos.estocastic_model.model;
 
 import com.unisinos.petrinet.models.Document;
 import com.unisinos.petrinet.services.CycleService;

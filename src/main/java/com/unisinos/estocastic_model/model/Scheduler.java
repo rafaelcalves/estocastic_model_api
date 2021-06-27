@@ -1,10 +1,10 @@
-package com.unisinos.estocastic_model.data;
+package com.unisinos.estocastic_model.model;
 
-import com.unisinos.estocastic_model.data.entities.*;
-import com.unisinos.estocastic_model.data.processes.ConsumptionProcess;
-import com.unisinos.estocastic_model.data.processes.EventType;
-import com.unisinos.estocastic_model.data.processes.Process;
-import com.unisinos.estocastic_model.data.processes.ProcessFactory;
+import com.unisinos.estocastic_model.model.entities.*;
+import com.unisinos.estocastic_model.model.processes.ConsumptionProcess;
+import com.unisinos.estocastic_model.model.processes.EventType;
+import com.unisinos.estocastic_model.model.processes.Process;
+import com.unisinos.estocastic_model.model.processes.ProcessFactory;
 
 import java.util.ArrayList;
 import java.util.List;

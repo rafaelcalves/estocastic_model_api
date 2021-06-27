@@ -1,4 +1,4 @@
-package com.unisinos.estocastic_model.data.processes;
+package com.unisinos.estocastic_model.model.processes;
 
 public enum EventType {
     ARRIVAL(0),
