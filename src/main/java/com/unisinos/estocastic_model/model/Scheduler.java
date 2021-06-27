@@ -241,13 +241,39 @@ public class Scheduler {
     }
 
     public void log(){
-        entitySets.forEach(EntitySet::logSize);
+        logSizes();
+        logTimes();
         lastLog = getTime();
     }
 
-    public void simulateBy(double duration) {  }
+    public void logSizes() {
+        entitySets.forEach(EntitySet::logSize);
+    }
 
-    public void simulateUntil(double absoluteTime) {  }
+    public void logTimes() {
+        List<Entity> temp;
+        for(int setsIterator = 0; setsIterator < entitySets.size(); setsIterator++) {
+            temp = entitySets.get(setsIterator).getEntities();
+            for(int entitiesIterator = 0; entitiesIterator < temp.size(); entitiesIterator++) {
+                entitySets.get(setsIterator).logTime(temp.get(entitiesIterator), getTime());
+            }
+        }
+    }
+
+    public void simulateBy(double duration) {
+        double timeFrame = getTime() + duration;
+        while(getTime() < timeFrame) {
+            simulateOneStep();
+            time++;
+        }
+    }
+
+    public void simulateUntil(double absoluteTime) {
+        while(getTime() < absoluteTime) {
+            simulateOneStep();
+            time++;
+        }
+    }
 
     //coleta de estatísticas
 
