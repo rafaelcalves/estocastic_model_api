@@ -18,14 +18,14 @@ public class Scheduler {
     private List<EntitySet> entitySets;
     private List<Process> processes;
     private int idIterator;
-    private List<PetriNet> waiters;
+    private List<Waiter> waiters;
     private ProcessFactory processFactory;
     private EntitySetFactory entitySetFactory;
     private EntityFactory entityFactory;
 
     private int totalCustomers;
 
-    Scheduler(){
+    public Scheduler(){
         init();
     }
 
