@@ -171,29 +171,39 @@ public class Scheduler {
         CustomerEntity entity = entityFactory.createCustomer(getNextId(), 0, customers);
         EntitySet cashier1Line = getEntitySetByType(EntitySetType.CASHIER_1);
         EntitySet cashier2Line = getEntitySetByType(EntitySetType.CASHIER_2);
+        EntitySetType smallerEntitySetType;
         if(cashier1Line.getSize() < cashier2Line.getSize()) {
             cashier1Line.insert(entity);
             process.setEntitySetType(cashier1Line.getType());
+            smallerEntitySetType = EntitySetType.CASHIER_1;
         }else {
             cashier2Line.insert(entity);
             process.setEntitySetType(cashier2Line.getType());
+            smallerEntitySetType = EntitySetType.CASHIER_1;
         }
 
-        triggerOrder(EventType.ORDER);
+        triggerOrderFromArrival(smallerEntitySetType);
         destroyProcess(process);
     }
 
-    private void triggerOrder(EventType eventType)
+    private Process triggerOrder(EventType eventType)
     {
         List<Process> orders = processes.stream()
               .filter(order -> order.getEventType().equals(eventType))
               .collect(Collectors.toList());
 
+        Process createdProcess = null;
         if(orders.size() < eventType.getResources())
         {
-            Process processOrder = processFactory.create(eventType, getNextId());
-            processes.add(processOrder);
+            createdProcess = processFactory.create(eventType, getNextId());
+            processes.add(createdProcess);
         }
+        return createdProcess;
+    }
+
+    private void triggerOrderFromArrival(EntitySetType entitySetType) {
+        Process process = triggerOrder(EventType.ORDER);
+        if(process!=null) process.setEntitySetType(entitySetType);
     }
 
     public void destroyProcess(Process process) {
